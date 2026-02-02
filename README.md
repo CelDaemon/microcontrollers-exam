@@ -9,7 +9,9 @@ Ensure you have the following installed before proceeding:
 - A working ARM GCC compiler
 - The ARM newlib library for the installed ARM GCC compiler
 
-On Arch Linux, this corresponds to the `cmake`, `arm-none-eabi-gcc`, and `arm-none-eabi-newlib` packages.
+On Arch Linux, this corresponds to the `git`, `cmake`, `arm-none-eabi-gcc`, and `arm-none-eabi-newlib` packages.
+
+On other platforms, see the [official Pico SDK documentation](https://pip-assets.raspberrypi.com/categories/610-raspberry-pi-pico/documents/RP-008276-DS-1-getting-started-with-pico.pdf) for instructions on preparing a build environment.
 
 ## Setup
 
@@ -31,8 +33,10 @@ To generate the files needed to start a build, run the following command.
 cmake -B build
 ```
 
-Then to build the project using these generated files, run:
+These generated files can then be used to build the project.
 
 ```sh
 cmake --build build -j16
 ```
+
+Finally, flash the PI PICO by mounting it in BOOTSEL mode and copying the file located at `build/main.uf2`.

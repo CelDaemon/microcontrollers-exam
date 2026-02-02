@@ -1,0 +1,16 @@
+- 1 PI Pico with headers
+- 1 micro USB to USB-A cable
+- 1 ultrasonic distance sensor
+- 1 breadboard pushbutton
+- 1 green LED
+- 3 red LEDs
+- 1 breadboard
+- 5 orange female to male jumper wires
+- ~~5 black male to male jumper wires~~
+- 1 black male to male jumper wire
+- 1 black female to male jumper wire
+- 1 black female to female jumper wire
+- 1 red female to female jumper wire
+- 1 orange female to female jumper wire
+- 1 yellow female to female jumper wire
+- 4 220 ohm resistors

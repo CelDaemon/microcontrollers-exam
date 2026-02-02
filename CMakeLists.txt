@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
-set(PICO_BOARD pico2_w)
+set(PICO_BOARD pico_w)
 
 include(pico-sdk/pico_sdk_init.cmake)
 
@@ -31,7 +31,7 @@ if(FLASH_ENABLED)
     endif()
     message("Using picotool: ${PICOTOOL_EXECUTABLE}")
     add_custom_target(flash USES_TERMINAL DEPENDS main
-        COMMAND ${PICOTOOL_EXECUTABLE} load -f -x $<TARGET_FILE:main>
+        COMMAND sudo ${PICOTOOL_EXECUTABLE} load -f -x $<TARGET_FILE:main>
     )
 endif()
 
