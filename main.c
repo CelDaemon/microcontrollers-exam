@@ -19,9 +19,9 @@
 #define ECHO_PIN 3
 
 absolute_time_t last_activated = 0;
-volatile absolute_time_t echo_started = 0;
-volatile float distance_mm = -INFINITY;
-volatile bool triggered = false;
+volatile absolute_time_t echo_started_register = 0;
+volatile float distance_mm_register = -INFINITY;
+volatile bool triggered_register = false;
 
 bool is_activated() {
     if(is_nil_time(last_activated))
@@ -30,7 +30,7 @@ bool is_activated() {
 }
 
 void trigger() {
-    triggered = true;
+    triggered_register = true;
     gpio_put(TRIGGER_PIN, 1);
     sleep_us(10);
     gpio_put(TRIGGER_PIN, 0);
@@ -38,21 +38,21 @@ void trigger() {
 
 void echo_irq(uint gpio, uint32_t event_mask) {
     if(event_mask & GPIO_IRQ_EDGE_RISE) {
-        echo_started = get_absolute_time();
+        echo_started_register = get_absolute_time();
         return;
     }
-    distance_mm = absolute_time_diff_us(echo_started, get_absolute_time()) / 5.8773f;
-    triggered = false;
+    distance_mm_register = absolute_time_diff_us(echo_started_register, get_absolute_time()) / 5.8773f;
+    triggered_register = false;
 }
 
-int get_strength_index(float distance_mm) {
-    if(distance_mm < 0)
+int get_strength_index(float distance_mm_register) {
+    if(distance_mm_register < 0)
         return 0;
-    if(distance_mm <= 100)
+    if(distance_mm_register <= 100)
         return 3;
-    if(distance_mm <= 200)
+    if(distance_mm_register <= 200)
         return 2;
-    if(distance_mm <= 300)
+    if(distance_mm_register <= 300)
         return 1;
     return 0;
 }
@@ -83,9 +83,9 @@ int main() {
             last_activated = get_absolute_time();
         if(is_activated()) {
             status = true;
-            if(!triggered)
+            if(!triggered_register)
                 trigger();
-            float cached_distance_mm = distance_mm;
+            float cached_distance_mm = distance_mm_register;
             if(cached_distance_mm > 0 && cached_distance_mm < min_distance_mm)
                 min_distance_mm = cached_distance_mm;
             strength_index = get_strength_index(cached_distance_mm);
@@ -93,7 +93,7 @@ int main() {
             printf("De opgeslagen afstand is: %f mm\n", min_distance_mm);
             last_activated = 0;
             min_distance_mm = INFINITY;
-            distance_mm = -INFINITY;
+            distance_mm_register = -INFINITY;
         }
         gpio_put(STATUS_PIN, status);
         gpio_put(STRENGTH1_PIN, strength_index > 0);
