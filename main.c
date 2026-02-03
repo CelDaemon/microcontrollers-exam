@@ -1,6 +1,7 @@
 #include <pico/stdlib.h>
 #include <stdio.h>
 #include <hardware/gpio.h>
+#include <math.h>
 
 #define BIT(x) (1u << (x))
 
@@ -19,7 +20,7 @@
 
 absolute_time_t last_activated = 0;
 volatile absolute_time_t echo_started = 0;
-volatile float distance_mm = -1.f;
+volatile float distance_mm = -INFINITY;
 volatile bool triggered = false;
 
 bool is_activated() {
@@ -74,7 +75,7 @@ int main() {
 
     gpio_set_irq_enabled_with_callback(ECHO_PIN, (GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL), true, echo_irq);
 
-    float min_distance_mm = -1;
+    float min_distance_mm = INFINITY;
     while(true) {
         bool status = false;
         int strength_index = 0;
@@ -85,13 +86,14 @@ int main() {
             if(!triggered)
                 trigger();
             float cached_distance_mm = distance_mm;
-            if(min_distance_mm == -1 || cached_distance_mm < min_distance_mm)
+            if(cached_distance_mm > 0 && cached_distance_mm < min_distance_mm)
                 min_distance_mm = cached_distance_mm;
             strength_index = get_strength_index(cached_distance_mm);
         } else if(!is_nil_time(last_activated)) {
-            last_activated = 0;
             printf("De opgeslagen afstand is: %f mm\n", min_distance_mm);
-            min_distance_mm = -1;
+            last_activated = 0;
+            min_distance_mm = INFINITY;
+            distance_mm = -INFINITY;
         }
         gpio_put(STATUS_PIN, status);
         gpio_put(STRENGTH1_PIN, strength_index > 0);
