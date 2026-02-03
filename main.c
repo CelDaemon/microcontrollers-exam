@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <hardware/gpio.h>
 
+#define BIT(x) (1u << (x))
+
 #define ACTIVATE_TIMEOUT (10 * 1000 * 1000)
 
 #define BUTTON_PIN 21
@@ -54,36 +56,23 @@ int get_strength_index(float distance_mm) {
     return 0;
 }
 
+#define INPUT_PINS (BIT(BUTTON_PIN) | BIT(ECHO_PIN))
+
+#define OUTPUT_PINS (BIT(STATUS_PIN) | BIT(STRENGTH1_PIN) | BIT(STRENGTH2_PIN) | BIT(STRENGTH3_PIN) | BIT(TRIGGER_PIN))
+
+#define PINS (INPUT_PINS | OUTPUT_PINS)
+
 int main() {
     stdio_init_all();
 
-    gpio_init(BUTTON_PIN);
-    gpio_set_dir(BUTTON_PIN, GPIO_IN);
+    gpio_init_mask(PINS);
+
+    gpio_set_dir_masked(INPUT_PINS, 0);
+    gpio_set_dir_masked(OUTPUT_PINS, ~0);
+
     gpio_pull_up(BUTTON_PIN);
 
-    gpio_init(STATUS_PIN);
-    gpio_set_dir(STATUS_PIN, GPIO_OUT);
-
-
-    gpio_init(STRENGTH1_PIN);
-    gpio_set_dir(STRENGTH1_PIN, GPIO_OUT);
-
-    gpio_init(STRENGTH1_PIN);
-    gpio_set_dir(STRENGTH1_PIN, GPIO_OUT);
-
-    gpio_init(STRENGTH2_PIN);
-    gpio_set_dir(STRENGTH2_PIN, GPIO_OUT);
-
-    gpio_init(STRENGTH3_PIN);
-    gpio_set_dir(STRENGTH3_PIN, GPIO_OUT);
-
-    gpio_init(TRIGGER_PIN);
-    gpio_set_dir(TRIGGER_PIN, GPIO_OUT);
-
-    gpio_init(ECHO_PIN);
-    gpio_set_dir(ECHO_PIN, GPIO_IN);
-
-    gpio_set_irq_enabled_with_callback(ECHO_PIN, (GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL), 1, echo_irq);
+    gpio_set_irq_enabled_with_callback(ECHO_PIN, (GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL), true, echo_irq);
 
     float min_distance_mm = -1;
     while(true) {
