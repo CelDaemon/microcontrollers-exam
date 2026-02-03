@@ -36,8 +36,8 @@ void trigger() {
     gpio_put(TRIGGER_PIN, 0);
 }
 
-void echo_irq() {
-    if(gpio_get(ECHO_PIN)) {
+void echo_irq(uint gpio, uint32_t event_mask) {
+    if(event_mask & GPIO_IRQ_EDGE_RISE) {
         echo_started = get_absolute_time();
         return;
     }
